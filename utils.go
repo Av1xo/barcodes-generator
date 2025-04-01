@@ -7,6 +7,7 @@ import (
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/datamatrix"
+	"github.com/boombuler/barcode/ean"
 	"github.com/boombuler/barcode/pdf417"
 	"github.com/boombuler/barcode/qr"
 	"github.com/boombuler/barcode/twooffive"
@@ -84,7 +85,26 @@ func datamatrixGenerator(w http.ResponseWriter, dataString string) {
 }
 
 func eanGenerator(w http.ResponseWriter, dataString string) {
-	panic("unimplemented")
+	if len(dataString) != 7 && len(dataString) != 12 {
+		fmt.Println("Invalid data")
+		http.Error(w, "Opps ean must be a 7 or 12 numbers", http.StatusInternalServerError)
+		return
+	}
+
+	eanCode, err := ean.Encode(dataString)
+	if err != nil {
+		fmt.Println("Encode Error:", err)
+		http.Error(w, "Opps something went wrong"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	scaledCode, _ := barcode.Scale(eanCode, 512, 512)
+
+	if err := png.Encode(w, scaledCode); err != nil {
+		fmt.Println("PNG Error:", err)
+		http.Error(w, "cannot encode to png: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func code32Generator(w http.ResponseWriter, dataString string) {
