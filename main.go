@@ -40,7 +40,7 @@ func viewCodeHandler(w http.ResponseWriter, r *http.Request) {
 	case "code93":
 		code93Generator(w, dataString)
 	case "code32":
-		code32Generator(w, dataString)
+		code39Generator(w, dataString)
 	case "ean":
 		eanGenerator(w, dataString)
 	case "datamatrix":
