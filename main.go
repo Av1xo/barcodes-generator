@@ -2,13 +2,9 @@ package main
 
 import (
 	"fmt"
-	"image/png"
 	"log"
 	"net/http"
 	"text/template"
-
-	"github.com/boombuler/barcode"
-	"github.com/boombuler/barcode/qr"
 )
 
 type Page struct {
@@ -30,8 +26,29 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 func viewCodeHandler(w http.ResponseWriter, r *http.Request) {
 	dataString := r.FormValue("dataString")
+	barcodeType := r.FormValue("barcodeType")
 
-	barCode, _ := qr.Encode(dataString, qr.L, qr.Auto)
-	barCode, _ = barcode.Scale(barCode, 512, 512)
-	png.Encode(w, barCode)
+	switch barcodeType {
+	case "qr":
+		qrGenerator(w, dataString)
+	case "codabar":
+		codabarGenerator(w, dataString)
+	case "aztec":
+		aztecGenerator(w, dataString)
+	case "code128":
+		code128Generator(w, dataString)
+	case "code93":
+		code93Generator(w, dataString)
+	case "code32":
+		code32Generator(w, dataString)
+	case "ean":
+		eanGenerator(w, dataString)
+	case "datamatrix":
+		datamatrixGenerator(w, dataString)
+	case "pdf417":
+		pdf417Generator(w, dataString)
+	case "twooffive":
+		twooffiveGenerator(w, dataString)
+	default:
+	}
 }
