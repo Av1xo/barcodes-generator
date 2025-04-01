@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/pdf417"
 	"github.com/boombuler/barcode/qr"
 	"github.com/boombuler/barcode/twooffive"
 )
@@ -40,7 +41,24 @@ func twooffiveGenerator(w http.ResponseWriter, dataString string) {
 }
 
 func pdf417Generator(w http.ResponseWriter, dataString string) {
-	
+	pdf417Code, err := pdf417.Encode(dataString, 8)
+	if err != nil {
+		fmt.Println("Encode Error:", err)
+		http.Error(w, "Opps something went wrong"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	pdf417Code, err = barcode.Scale(pdf417Code, 1024, 256)
+	if err != nil {
+		fmt.Println("Scale Error:", err)
+		http.Error(w, "Opps something went wrong"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := png.Encode(w, pdf417Code); err != nil {
+		http.Error(w, "cannot encode to png", http.StatusInternalServerError)
+		return
+	}
 }
 
 func datamatrixGenerator(w http.ResponseWriter, dataString string) {
