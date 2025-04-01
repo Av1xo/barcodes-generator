@@ -7,9 +7,9 @@
 </head>
 <body>
     <h1>{{ .Title }}</h1>
-    <div>Please enter the string:</div>
     <form action="/generator" method=post>
-        <select name="barcodeType">
+        <div>
+            <select name="barcodeType">
             <optgroup label="Choose type barcode">
                 <option value="qr">qr</option>
                 <option value="codabar">codabar</option>
@@ -23,7 +23,19 @@
                 <option value="twooffive">twooffive</option>
             </optgroup>
         </select>
-        <input type="text" name="dataString">
+
+            <label for="datastring">Please enter the string:</label>
+            <input type="text" name="dataString">
+        </div>
+
+        <div>
+            <label for="width">width:</label>
+        <input type="number" name="width">
+        
+        <label for="heigth">height:</label>
+        <input type="number" name="height">
+        </div>
+        
         <input type="submit" value="Submit">
     </form>
 </body>
