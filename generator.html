@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode generator</title>
+</head>
+<body>
+    <h1>{{ .Title }}</h1>
+    <div>Please enter the string:</div>
+    <form action="/generator" method=post>
+        <optgroup>
+            <option value="qr">qr</option>
+            <option value="codabar">codabar</option>
+            <option value="aztec">aztec</option>
+            <option value="code128">code128</option>
+            <option value="code93">code93</option>
+            <option value="code32">code32</option>
+            <option value="datamatrix">datamatrix</option>
+            <option value="ean">ean</option>
+            <option value="pdf417">pdf417</option>
+            <option value="twofile">twofile</option>
+        </optgroup>
+        <input type="text" name="dataString">
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
