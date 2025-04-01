@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/datamatrix"
 	"github.com/boombuler/barcode/pdf417"
 	"github.com/boombuler/barcode/qr"
 	"github.com/boombuler/barcode/twooffive"
@@ -62,7 +63,24 @@ func pdf417Generator(w http.ResponseWriter, dataString string) {
 }
 
 func datamatrixGenerator(w http.ResponseWriter, dataString string) {
-	panic("unimplemented")
+	datamatrixCode, err := datamatrix.Encode(dataString)
+	if err != nil {
+		fmt.Println("Encode Error:", err)
+		http.Error(w, "Opps something went wrong"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	datamatrixCode, err = barcode.Scale(datamatrixCode, 512, 512)
+	if err != nil {
+		fmt.Println("Scale Error:", err)
+		http.Error(w, "Opps something went wrong"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := png.Encode(w, datamatrixCode); err != nil {
+		http.Error(w, "cannot encode to png", http.StatusInternalServerError)
+		return
+	}
 }
 
 func eanGenerator(w http.ResponseWriter, dataString string) {
