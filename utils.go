@@ -8,6 +8,7 @@ import (
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/aztec"
+	"github.com/boombuler/barcode/codabar"
 	"github.com/boombuler/barcode/code128"
 	"github.com/boombuler/barcode/code39"
 	"github.com/boombuler/barcode/code93"
@@ -226,7 +227,29 @@ func aztecGenerator(w http.ResponseWriter, dataString string) {
 }
 
 func codabarGenerator(w http.ResponseWriter, dataString string) {
-	panic("unimplemented")
+	if !validateCodabar(dataString) {
+		http.Error(w, "Opps Opps invalid input", http.StatusBadRequest)
+		return
+	}
+
+	codabarCode, err := codabar.Encode(dataString)
+	if err != nil {
+		fmt.Println("Encode Error:", err)
+		http.Error(w, "Opps something went wrong"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	scaledCode, err := barcode.Scale(codabarCode, 512, 512)
+	if err != nil {
+		fmt.Println("Scale Error:", err)
+		http.Error(w, "Opps something went wrong"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := png.Encode(w, scaledCode); err != nil {
+		http.Error(w, "cannot encode to png", http.StatusInternalServerError)
+		return
+	}
 }
 
 func qrGenerator(w http.ResponseWriter, data string) {
@@ -276,6 +299,13 @@ func validateAztec(input string) bool {
 	// (A-Z, a-z), (0-9)
 	// space, +, -, ., $, /, :, ;, etc.
 	regex := "^[A-Za-z0-9\\-\\.\\$\\/\\:\\+\\,\\?\\!\\*\\(\\)]+$"
+	re := regexp.MustCompile(regex)
+	return re.MatchString(input)
+}
+
+func validateCodabar(input string) bool {
+	// Codabar: start and end [A, B, C, D], in the mid nums and sym
+	regex := "^[ABCD][0-9\\-\\.\\$\\/\\:\\+]+[ABCD]$"
 	re := regexp.MustCompile(regex)
 	return re.MatchString(input)
 }
