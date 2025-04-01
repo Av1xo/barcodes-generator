@@ -7,6 +7,7 @@ import (
 	"regexp"
 
 	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/aztec"
 	"github.com/boombuler/barcode/code128"
 	"github.com/boombuler/barcode/code39"
 	"github.com/boombuler/barcode/code93"
@@ -199,7 +200,29 @@ func code128Generator(w http.ResponseWriter, dataString string) {
 }
 
 func aztecGenerator(w http.ResponseWriter, dataString string) {
-	panic("unimplemented")
+	if !validateAztec(dataString) {
+		http.Error(w, "Opps Opps invalid input", http.StatusBadRequest)
+		return
+	}
+
+	aztecCode, err := aztec.Encode([]byte(dataString), aztec.DEFAULT_EC_PERCENT, aztec.DEFAULT_LAYERS)
+	if err != nil {
+		fmt.Println("Encode Error:", err)
+		http.Error(w, "Opps something went wrong"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	scaledCode, err := barcode.Scale(aztecCode, 512, 512)
+	if err != nil {
+		fmt.Println("Scale Error:", err)
+		http.Error(w, "Opps something went wrong"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := png.Encode(w, scaledCode); err != nil {
+		http.Error(w, "cannot encode to png", http.StatusInternalServerError)
+		return
+	}
 }
 
 func codabarGenerator(w http.ResponseWriter, dataString string) {
